@@ -15,7 +15,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = GoodVC()
+        //let a = Rect(frame: UIScreen.main.bounds)
+        //window?.rootViewController?.view.addSubview(a)
+        window?.makeKeyAndVisible()
+
+
+  
+        /*
+        let layer = CAEAGLLayer()
+        layer.drawableProperties = [kEAGLDrawablePropertyRetainedBacking: false]
+    
+        let a = Test(frame: CGRect(x: 0, y: 0, width: 300, height: 700))
+        window?.rootViewController?.view.addSubview(a)
+        */
         return true
     }
 

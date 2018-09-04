@@ -1,0 +1,63 @@
+
+
+
+[{
+    name: "sinx",
+    id: 1,
+    derivative: "sinx_d"
+ },
+ 
+ {
+    name: "cosx",
+    id: 2
+ },
+ 
+ {
+    name: "tanx",
+    id: 3
+ },
+ 
+ {
+    name: "cotx",
+    id: 4
+ },
+ 
+ {
+    name: "secx",
+    id: 5
+ },
+ 
+ {
+    name: "cscs",
+    id: 6
+ },
+ 
+ {
+    name: "arcsinx",
+    id: 7
+ },
+ 
+ {
+    name: "arccosx",
+    id: 8
+ },
+ 
+ {
+    name: "arctanx",
+    id: 9
+ },
+ 
+ {
+    name: "arccotx",
+    d:10
+ },
+ 
+ {
+    name: "arcsecx",
+    id: 11
+ },
+ 
+ {
+    name: "arccscx",
+    id: 12
+ }]

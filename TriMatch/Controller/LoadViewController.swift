@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  LoadViewController.swift
 //  TriMatch
 //
 //  Created by sj on 2018/7/3.
@@ -8,13 +8,15 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class LoadViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
 
+
+        
+    
+    }
+    
 
 }
-

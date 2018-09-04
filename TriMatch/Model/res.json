@@ -1,0 +1,74 @@
+
+
+
+[{
+    "name": "sinx",
+    "id": 1,
+    "derivative_pic": "sinx_d"
+ },
+ 
+ {
+    "name": "cosx",
+    "id": 2,
+    "derivative_pic": "cos_d"
+ },
+ 
+ {
+    "name": "tanx",
+    "id": 3,
+    "derivative_pic": "tanx_d"
+ },
+ 
+ {
+    "name": "cotx",
+    "id": 4,
+    "derivative_pic": "cotx_d"
+ },
+ 
+ {
+    "name": "secx",
+    "id": 5,
+    "derivative_pic": "secx_d"
+ },
+ 
+ {
+    "name": "cscs",
+    "id": 6,
+    "derivative_pic": "cscx_d"
+ },
+ 
+ {
+    "name": "arcsinx",
+    "id": 7,
+    "derivative_pic": "arcsinx_d"
+ },
+ 
+ {
+    "name": "arccosx",
+    "id": 8,
+    "derivative_pic": "arccosx_d"
+ },
+ 
+ {
+    "name": "arctanx",
+    "id": 9,
+    "derivative_pic": "arctanx_d"
+ },
+ 
+ {
+    "name": "arccotx",
+    "id":10,
+    "derivative_pic": "arccotx_d"
+ },
+ 
+ {
+    "name": "arcsecx",
+    "id": 11,
+    "derivative_pic": "arcsecx_d"
+ },
+ 
+ {
+    "name": "arccscx",
+    "id": 12,
+    "derivative_pic": "arccscx_d"
+ }]
