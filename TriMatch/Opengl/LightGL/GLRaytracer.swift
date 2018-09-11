@@ -151,9 +151,9 @@ class Raytracer {
             let ap = a.substract(hit)
             let bp = b.substract(hit)
             let cp = c.substract(hit)
-            let areaABP = ap.cross(ba).lengh() / 2
-            let areaBCP = bp.cross(cp).lengh() / 2
-            let areaCAP = cp.cross(ap).lengh() / 2
+            let areaABP = ap.cross(ba).length() / 2
+            let areaBCP = bp.cross(cp).length() / 2
+            let areaCAP = cp.cross(ap).length() / 2
             if areaABC == (areaABP + areaBCP + areaCAP)
             {
                 return HitTest(t: t, hit: hit, normal: normal)

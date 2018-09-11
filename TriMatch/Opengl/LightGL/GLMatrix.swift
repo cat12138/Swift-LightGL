@@ -251,101 +251,30 @@ class GLMatrix {
                      0, 1, 0, 0,
                      0, 0, 1, 0,
                      0, 0, 0, 1]
+        
+        //result.m = [xi, yi, zi, 0,
+        //            xj, yj, zj, 0,
+        //            xk, yk, zk, 0,
+        //            0, 0, 0, 1] //基矩阵
         return _result
     }
     
     
-    /// @function for projection matrix, 3D to 2D; only objects in frustum are visible
-    /// GLMatrix.frustum(l, r, b, t, n, f[, result])
-    /// glFrustum()
-    /// @return a projection matrix(general)
-    class func frustum(l: GLfloat, r: GLfloat, b: GLfloat, t: GLfloat, n: GLfloat, f: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
-        let _result = result == nil ? GLMatrix() : result!
-        var m = _result.m
-        
-        m[0] = 2 * n / (r - l);
-        m[1] = 0;
-        m[2] = (r + l) / (r - l);
-        m[3] = 0;
-        
-        m[4] = 0;
-        m[5] = 2 * n / (t - b);
-        m[6] = (t + b) / (t - b);
-        m[7] = 0;
-        
-        m[8] = 0;
-        m[9] = 0;
-        m[10] = -(f + n) / (f - n);
-        m[11] = -2 * f * n / (f - n);
-        
-        m[12] = 0;
-        m[13] = 0;
-        m[14] = -1;
-        m[15] = 0;
-        
-        _result.m = m
-        return _result
-    }
+    
+    ///        model matrix      view matrix   projection matrix  projection division
+    /// model space ---> world space ---> camera space ---> clip space ----> NDC space ----> screen space
     
     
-    /// GLMatrix.perspective(fov, aspect, near, far[, result])
-    /// gluPerspective()
-    /// @return a projectio matrix, with fov parameters
-    class func perspective(fov: GLfloat, aspect: GLfloat, near: GLfloat, far: GLfloat, result: GLMatrix? = nil) -> GLMatrix{
-        let _result = result == nil ? GLMatrix() : result!
-        
-        let y = tan(fov * .pi / 360) * near
-        let x = y * aspect
-        
-        return GLMatrix.frustum(l: -x, r: x, b: -y, t: y, n: near, f: far, _result)
-    }
     
-    
-    /// GLMatrix.ortho()
-    class func ortho(l: GLfloat, r: GLfloat, b: GLfloat, t: GLfloat, n: GLfloat, f: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
-        let _result = result == nil ? GLMatrix() : result!
-        var m = _result.m
-        
-        m[0] = 2 / (r - l);
-        m[1] = 0;
-        m[2] = 0;
-        m[3] = -(r + l) / (r - l);
-        
-        m[4] = 0;
-        m[5] = 2 / (t - b);
-        m[6] = 0;
-        m[7] = -(t + b) / (t - b);
-        
-        m[8] = 0;
-        m[9] = 0;
-        m[10] = -2 / (f - n);
-        m[11] = -(f + n) / (f - n);
-        
-        m[12] = 0;
-        m[13] = 0;
-        m[14] = 0;
-        m[15] = 1;
-        
-        _result.m = m
-        return _result
-    }
-    
-    
-    class func lookAt() -> GLMatrix {
-        let m = GLMatrix()
-        return m
-    }
-    
-    
-    //MARK: 三个transform
-    // ### GLMatrix.scale(x, y, z[, result])
-    //
-    // This emulates the OpenGL function `glScale()`. You can optionally pass an
-    // existing matrix in `result` to avoid allocating a new matrix.
-    //|Sx, 0, 0, 0|   |x|
-    //|0, Sy, 0, 0|   |y|
-    //|0, 0, Sz, 0|   |z|
-    //|0, 0, 0, 1 |   |1|
+    // MARK: 三个transform
+    // 对
+    /// 1 - from model space to world space
+    /// GLMatrix.scale(x, y, z[, result])
+    /// glScale()
+    /// |Sx, 0, 0, 0|   |x|
+    /// |0, Sy, 0, 0|   |y|
+    /// |0, 0, Sz, 0|   |z|
+    /// |0, 0, 0, 1 |   |1|
     class func scale(Sx: GLfloat, Sy: GLfloat, Sz: GLfloat, result: GLMatrix? = nil) -> GLMatrix {
         let _result = result == nil ? GLMatrix() : result!
         var r = _result.m
@@ -406,14 +335,26 @@ class GLMatrix {
     }
     
     
-    // ### GLMatrix.rotate(a, x, y, z[, result])
-    //
-    // Returns a matrix that rotates by `a` degrees around the vector `x, y, z`.
-    // You can optionally pass an existing matrix in `result` to avoid allocating
-    // a new matrix. This emulates the OpenGL function `glRotate()`.
+    /// GLMatrix.rotate(a, x, y, z[, result])
+    /// glRotate()
+    /// @return a matrix that rotates by `a` degrees around the vector `x, y, z`.
     class func rotate(a: GLfloat, Rx: GLfloat, Ry: GLfloat, Rz: GLfloat, result: GLMatrix? = nil) -> GLMatrix {
         let _result = result == nil ? GLMatrix() : result!
         var r = _result.m
+        
+        let au = GLVector(x: Rx, y: Ry, z: Rz).unit() //旋转轴单位化
+        let radian = a * .pi / 180 //转弧度制
+        let c = cos(radian), s = sin(radian), t = 1 - c
+        
+        let v = GLVector(x: 1, y: 0, z: 0) //要旋转的点
+        let va = au.multiply(au.dot(v)) //在旋转轴上的分量，不参与旋转
+        let v1 = v.substract(va) //垂直旋转轴的分量，旋转
+        
+        let v2 = au.cross(v1)
+        let v11 = v1.multiply(c).add(v2.multiply(s))
+        
+        let vv = va.add(v11)
+        
         
         
         
@@ -500,9 +441,9 @@ class GLMatrix {
     }
     
     
+    //roll翻滚角 绕z轴转
     //正交矩阵，A^t = A^-1
     //绕谁转，谁是1
-    //roll翻滚角 绕z轴转
     //|cos(t), -sin(t), 0, 0|
     //|sin(t), cos(t), 0, 0|
     //|0, 0, 1, 0|
@@ -536,12 +477,18 @@ class GLMatrix {
         return _result
     }
     
-    
-    class func euler(_ result: GLMatrix? = nil) -> GLMatrix {
-        let _result = result == nil ? GLMatrix() : result!
-        var r = _result.m
+    /// @param pitch x
+    /// @param yaw y
+    /// @param roll z
+    class func euler(pitch: GLfloat, yaw: GLfloat, roll: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
+        var _result = result == nil ? GLMatrix() : result!
         
-        _result.m = r
+        let Rx = GLMatrix.rotateX(pitch)
+        let Ry = GLMatrix.rotateY(yaw)
+        let Rz = GLMatrix.rotateZ(roll)
+        
+        _result = Rz.multiply(Ry.multiply(Rx))
+        
         return _result
     }
     
@@ -550,7 +497,190 @@ class GLMatrix {
         
     }
     
-    ///        model matrix    view matri   projection matrix
-    /// model space -> world space -> camera space -> screen space
+    
+    
+   
+
+    
+    /// 2 - from world space to camera space
+    /// @param ex ey ex: eye point
+    /// @param cx cy cz: target point
+    /// @param ux uy uz: up direction
+    /// default eye = (0, 0, 0), up = (0, 1, 0, center = (0, 0, -z)
+    class func lookAt(ex: GLfloat, ey: GLfloat, ez: GLfloat, cx: GLfloat, cy: GLfloat, cz: GLfloat, ux: GLfloat, uy: GLfloat, uz: GLfloat, _ result: GLMatrix? = nil)  -> GLMatrix {
+        let _result = result == nil ? GLMatrix() : result!
+        var m = _result.m
+        
+        let e = GLVector(x: ex, y: ey, z: ez)
+        let c = GLVector(x: cx, y: cy, z: cz)
+        let u = GLVector(x: ux, y: uy, z: uz)
+        
+        //camera coordinate
+        let f = e.substract(c).unit()   //z
+        let s = u.cross(f).unit()     //x
+        let t = f.cross(s).unit()     //y
+        
+        
+        //相机坐标相对世界坐标进行了旋转/平移，M=T*R（顶点不动）
+        //因为opengl，世界坐标和相机坐标重合，所以定点做了M的逆矩阵，即M^-1 = R^-1 * T^-1
+        //M^-1 is what we need
+        /*
+         let transInverse = GLMatrix(m0: 1, m1: 0, m2: 0, m3: -ex,
+         m4: 0, m5: 1, m6: 0, m7: -ey,
+         m8: 0, m9: 0, m10: 1, m11: -ez,
+         m12: 0, m13: 0, m14: 0, m15: 1)
+         
+         let camera = GLMatrix(m0: s.x, m1: t.x, m2: f.x, m3: 0,
+         m4: s.y, m5: t.y, m6: f.y, m7: 0,
+         m8: s.z, m9: t.z, m10: f.z, m11: 0,
+         m12: 0, m13: 0, m14: 0, m15: 1)
+         
+         let cameraInverse = GLMatrix(m0: s.x, m1: s.y, m2: s.z, m3: 0,
+         m4: t.x, m5: t.y, m6: t.z, m7: 0,
+         m8: f.x, m9: f.y, m10: f.z, m11: 0,
+         m12: 0, m13: 0, m14: 0, m15: 1)
+         
+         //let MI: GLMatrix = cameraInverse.multiply(transInverse)
+         let MI = GLMatrix(m0: s.x, m1: s.y, m2: s.z, m3: -s.dot(e),
+         m4: t.x, m5: t.y, m6: t.z, m7: -t.dot(e),
+         m8: f.x, m9: f.y, m10: f.z, m11: -f.dot(e),
+         m12: 0, m13: 0, m14: 0, m15: 1)
+         */
+        m[0] = s.x
+        m[1] = s.y
+        m[2] = s.z
+        m[3] = -s.dot(e)
+        
+        m[4] = t.x
+        m[5] = t.y
+        m[6] = t.z
+        m[7] = -t.dot(e)
+        
+        m[8] = f.x
+        m[9] = f.y
+        m[10] = f.z
+        m[11] = -f.dot(e)
+        
+        m[12] = 0
+        m[13] = 0
+        m[14] = 0
+        m[15] = 1
+        
+        _result.m = m
+        return _result
+    }
+    
+    
+    /// 3 - from camera space to clip space
+    /// GLMatrix.frustum(l, r, b, t, n, f[, result])
+    /// glFrustum()
+    /// @return a projection matrix(general)
+    class func frustum(l: GLfloat, r: GLfloat, b: GLfloat, t: GLfloat, n: GLfloat, f: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
+        let _result = result == nil ? GLMatrix() : result!
+        var m = _result.m
+        
+        m[0] = 2 * n / (r - l);
+        m[1] = 0;
+        m[2] = (r + l) / (r - l);
+        m[3] = 0;
+        
+        m[4] = 0;
+        m[5] = 2 * n / (t - b);
+        m[6] = (t + b) / (t - b);
+        m[7] = 0;
+        
+        m[8] = 0;
+        m[9] = 0;
+        m[10] = -(f + n) / (f - n);
+        m[11] = -2 * f * n / (f - n);
+        
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = -1;
+        m[15] = 0;
+        
+        _result.m = m
+        return _result
+    }
+    
+    
+    /// GLMatrix.perspective(fov, aspect, near, far[, result])
+    /// gluPerspective()
+    /// @return a projectio matrix, with fov parameters
+    class func perspective(fov: GLfloat, aspect: GLfloat, near: GLfloat, far: GLfloat, result: GLMatrix? = nil) -> GLMatrix{
+        let _result = result == nil ? GLMatrix() : result!
+        
+        let y = tan(fov * .pi / 360) * near
+        let x = y * aspect
+        
+        return GLMatrix.frustum(l: -x, r: x, b: -y, t: y, n: near, f: far, _result)
+    }
+    
+    
+    /// GLMatrix.ortho()
+    class func ortho(l: GLfloat, r: GLfloat, b: GLfloat, t: GLfloat, n: GLfloat, f: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
+        let _result = result == nil ? GLMatrix() : result!
+        var m = _result.m
+        
+        m[0] = 2 / (r - l);
+        m[1] = 0;
+        m[2] = 0;
+        m[3] = -(r + l) / (r - l);
+        
+        m[4] = 0;
+        m[5] = 2 / (t - b);
+        m[6] = 0;
+        m[7] = -(t + b) / (t - b);
+        
+        m[8] = 0;
+        m[9] = 0;
+        m[10] = -2 / (f - n);
+        m[11] = -(f + n) / (f - n);
+        
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = 0;
+        m[15] = 1;
+        
+        _result.m = m
+        return _result
+    }
+    
+    
+    
+    /// 5 - from NDC space to screen space
+    /// glViewport(GLint sx, GLint sy, GLsizei ws, GLsizei hs);
+    /// glDepthRangef(GLclampf ns, GLclampf fs);
+    class func viewport(sx: GLfloat, sy: GLfloat, w: GLfloat, h: GLfloat, n: GLfloat, f: GLfloat, _ result: GLMatrix? = nil) -> GLMatrix {
+        let _result = result == nil ? GLMatrix() : result!
+        var m = _result.m
+        
+        m[0] = w/2
+        m[1] = 0
+        m[2] = 0
+        m[3] = sx + w/2
+        
+        m[4] = 0
+        m[5] = h/2
+        m[6] = 0
+        m[7] = sy + h/2
+        
+        m[8] = 0
+        m[9] = 0
+        m[10] = (f - n)/2
+        m[11] = (f + n)/2
+        
+        m[12] = 0
+        m[13] = 0
+        m[14] = 0
+        m[15] = 1
+        
+        _result.m = m
+        return _result
+    }
+    
+    
+    
+    
 
 }

@@ -38,7 +38,7 @@ class PlayViewController: GLBaseViewController {
         m.loadShader()
         m.bindVertexData()
         m.computeWireframe()
-        
+    
 
         
     
@@ -48,7 +48,7 @@ class PlayViewController: GLBaseViewController {
         super.glkView(view, drawIn: rect)
         
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT) | GLbitfield(GL_STENCIL_BUFFER_BIT))
-        glClearColor(1, 0, 1, 1)
+        glClearColor(1, 1, 1, 1)
         
         //s.draw()
     

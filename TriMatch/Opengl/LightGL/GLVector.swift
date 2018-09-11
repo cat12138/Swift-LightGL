@@ -85,12 +85,12 @@ class GLVector {
         return GLVector(x: nX, y: nY, z: nZ)
     }
     
-    func lengh() -> GLfloat {
+    func length() -> GLfloat {
         return sqrtf(self.dot(self))
     }
     
     func unit() -> GLVector {
-        return self.divide(self.lengh())
+        return self.divide(self.length())
     }
     
     func min() -> GLfloat {
