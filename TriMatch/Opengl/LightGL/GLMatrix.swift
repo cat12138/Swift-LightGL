@@ -337,6 +337,7 @@ class GLMatrix {
     
     /// GLMatrix.rotate(a, x, y, z[, result])
     /// glRotate()
+    /// @a: rotate angle anticlockwise
     /// @return a matrix that rotates by `a` degrees around the vector `x, y, z`.
     class func rotate(a: GLfloat, Rx: GLfloat, Ry: GLfloat, Rz: GLfloat, result: GLMatrix? = nil) -> GLMatrix {
         let _result = result == nil ? GLMatrix() : result!
@@ -346,14 +347,38 @@ class GLMatrix {
         let radian = a * .pi / 180 //转弧度制
         let c = cos(radian), s = sin(radian), t = 1 - c
         
-        let v = GLVector(x: 1, y: 0, z: 0) //要旋转的点
+        //大致推导
+        /*
+        let v = GLVector(x: 1, y: 0, z: 0) //要旋转的点 //v=(0,1,0), v=(0,0,1)
         let va = au.multiply(au.dot(v)) //在旋转轴上的分量，不参与旋转
         let v1 = v.substract(va) //垂直旋转轴的分量，旋转
         
-        let v2 = au.cross(v1)
+        let v2 = v1.cross(au)
         let v11 = v1.multiply(c).add(v2.multiply(s))
         
         let vv = va.add(v11)
+        */
+        
+        r[0] = au.x*au.x*t + c
+        r[1] = au.x*au.y*t - au.z*s
+        r[2] = au.x*au.z*t + au.y*s
+        r[3] = 0
+        
+        r[4] = au.y*au.x*t + au.z*s
+        r[5] = au.y*au.y*t + c
+        r[6] = au.y*au.z*t - au.x*s
+        r[7] = 0
+        
+        r[8] = au.z*au.x*t - au.y*s
+        r[9] = au.z*au.y*t + au.x*s
+        r[10] = au.z*au.z*t + c
+        r[11] = 0
+        
+        r[12] = 0
+        r[13] = 0
+        r[14] = 0
+        r[15] = 1
+      
         
         
         
